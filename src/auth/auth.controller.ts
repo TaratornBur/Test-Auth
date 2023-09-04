@@ -84,4 +84,17 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
+
+  @Post('/confirmLogin/:password')
+  async confirmLogin(
+    @Param('password') password: string,
+  ): Promise<HttpResponse> {
+    const user = await this.authService.confirmLogin(password);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'การลงทะเบียนสำเร็จ',
+      data: user,
+    };
+  }
 }

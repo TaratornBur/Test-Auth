@@ -12,6 +12,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/interfaces/users.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfirmUserDto } from './dto/confirmUser.dto';
+import * as crypto from 'crypto-js';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +30,11 @@ export class AuthService {
   }
   async signIn(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(username);
-    if (user?.password !== pass && user?.status !== 'activate') {
+    const confirmPassword = await this.decodeData(
+      pass,
+      process.env.SECRET_KEY_FOR_CONFIRM,
+    );
+    if (user?.password !== confirmPassword && user?.status !== 'activate') {
       throw new UnauthorizedException();
     }
     //const { password, ...result } = user;
@@ -69,7 +74,7 @@ export class AuthService {
 
   async confirmTokenFromCache(
     confirmUserDto: ConfirmUserDto,
-  ): Promise<User | undefined> {
+  ): Promise<any | undefined> {
     try {
       const cachedData = await this.cache.get<User>(confirmUserDto.token);
       console.log(cachedData);
@@ -81,6 +86,50 @@ export class AuthService {
       console.log('updateStatusUser: ', updateStatusUser);
 
       return cachedData; // Returns the cached data if found, or undefined if not found
+    } catch (error) {
+      // Handle any cache retrieval errors here
+      console.error('Error retrieving cached data:', error);
+      return undefined;
+    }
+  }
+
+  async encodeData(password: string): Promise<any> {
+    const timestamp = Date.now().toString();
+    const encodedData = crypto.AES.encrypt(
+      password + timestamp,
+      process.env.SECRET_KEY_FOR_CONFIRM,
+    ).toString();
+    return encodedData;
+  }
+
+  async decodeData(encodedData: string, key: string): Promise<string | null> {
+    try {
+      const decryptedBytes = crypto.AES.decrypt(encodedData, key);
+      const decryptedData = decryptedBytes.toString(crypto.enc.Utf8);
+
+      // Assuming that the timestamp length is consistent (e.g., 13 characters for milliseconds)
+      const timestampLength = 13;
+
+      // Extract the password by removing the timestamp
+      const password = decryptedData.substring(
+        0,
+        decryptedData.length - timestampLength,
+      );
+
+      return password;
+    } catch (error) {
+      // Decryption failed
+      console.error('Decryption error:', error);
+      return null;
+    }
+  }
+
+  async confirmLogin(password: string): Promise<User | undefined> {
+    try {
+      const encode = await this.encodeData(password);
+      console.log(encode);
+
+      return; // Returns the cached data if found, or undefined if not found
     } catch (error) {
       // Handle any cache retrieval errors here
       console.error('Error retrieving cached data:', error);
