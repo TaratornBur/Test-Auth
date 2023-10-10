@@ -14,7 +14,7 @@ ENV NODe_ENV=${NODE_ENV}
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --force
 
 # Copy local code to the container image.
 COPY . ./
