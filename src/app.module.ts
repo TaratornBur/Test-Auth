@@ -10,6 +10,9 @@ import { redisStore } from 'cache-manager-redis-store';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import mongoose from 'mongoose';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 mongoose.set('strictQuery', false); // Suppress the warning
 
@@ -17,14 +20,14 @@ mongoose.set('strictQuery', false); // Suppress the warning
   imports: [
     AuthModule,
     UsersModule,
-    MongooseModule.forRoot('mongodb://localhost/nest'),
-    CacheModule.register({
-      store: redisStore,
+    // MongooseModule.forRoot('mongodb://localhost/test-auth'),
+    // CacheModule.register({
+    //   store: redisStore,
 
-      // Store-specific configuration:
-      host: 'localhost',
-      port: 6379,
-    }),
+    //   // Store-specific configuration:
+    //   host: 'localhost',
+    //   port: 6379,
+    // }),
     ProductModule,
     OrderModule,
   ],
