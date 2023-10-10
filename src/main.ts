@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
 dotenv.config();
 async function bootstrap() {

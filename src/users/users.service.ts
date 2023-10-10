@@ -59,6 +59,24 @@ export class UsersService {
     return updatedUser;
   }
 
+  async updateAuthToUser(id: string, access_token: string, refresh_token: string) {
+
+    const updatedUserAuthToUse = await this.userModel.findByIdAndUpdate(
+      id,
+      { access_token, refresh_token}, // Update only the status field
+      { new: true },
+    );
+
+    console.log('updatedUserAuthToUse: ', updatedUserAuthToUse);
+
+
+    if (!updatedUserAuthToUse) {
+      throw new NotFoundException('ไม่พบข้อมูลของยูสเซอร์นี้');
+    }
+
+    return updatedUserAuthToUse;
+  }
+
   remove(id: number) {
     return `This action removes a #${id} user`;
   }

@@ -16,6 +16,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { HttpResponse } from 'src/shared/interfaces/http-response.interface';
 import { ConfirmUserDto } from './dto/confirmUser.dto';
 import { AuthGuard } from './auth.guard';
+import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
 
 //only admin can edit
 @Controller('auth')
@@ -90,6 +91,31 @@ export class AuthController {
     @Param('password') password: string,
   ): Promise<HttpResponse> {
     const user = await this.authService.confirmLogin(password);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'การลงทะเบียนสำเร็จ',
+      data: user,
+    };
+  }
+
+  @UseGuards(RefreshJwtGuard)
+  @Post('/refreshToken')
+  async refreshToken(
+    @Request() req,
+  ): Promise<HttpResponse> {
+    const user = await this.authService.refreshToken(req.user);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'การลงทะเบียนสำเร็จ',
+      data: user,
+    };
+  }
+
+  @Post('/:decodePassword')
+  async decodePassword(@Param('decodePassword') encodedData: string): Promise<HttpResponse> {
+    const user = await this.authService.decodePassword(encodedData);
 
     return {
       statusCode: HttpStatus.CREATED,

@@ -49,6 +49,7 @@
     "mv": "^2.1.1",
     "package-name": "^0.1.0",
     "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pupeteer": "^0.0.1",
     "puppeteer": "^20.4.0",

@@ -9,6 +9,9 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
+import mongoose from 'mongoose';
+
+mongoose.set('strictQuery', false); // Suppress the warning
 
 @Module({
   imports: [

@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto-js';
 export const UserSchema = new mongoose.Schema(
   {
     username: {
@@ -31,6 +32,14 @@ export const UserSchema = new mongoose.Schema(
       type: [String],
       default: undefined,
     },
+    access_token: {
+      type: String,
+      default: false
+    },
+    refresh_token: {
+      type: String,
+      default: false
+    },
     deleteAt: {
       type: Date,
       required: false,
@@ -46,17 +55,15 @@ UserSchema.pre('save', async function (next) {
   if (!user.isModified('password')) next();
 
   try {
-    const hash = await bcrypt.hashSync(user.password, 10);
+    // const hash = await bcrypt.hashSync(user.password, 10);
+    //const timestamp = Date.now().toString();
+    const hash = crypto.AES.encrypt(
+      user.password ,
+      process.env.SECRET_KEY_FOR_PASSWORD,
+    ).toString();
     user.password = hash;
     next();
   } catch (error) {
     next(error);
   }
 });
-
-/** METHOD */
-UserSchema.methods.comparePassword = async function comparePassword(
-  attempt: string,
-) {
-  return await bcrypt.compare(attempt, this.password);
-};
